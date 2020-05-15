@@ -1,0 +1,40 @@
+{
+  "name": "webpack-typescript-threejs",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "license": "MIT",
+  "scripts": {
+    "dev": "webpack --mode development --watch",
+    "start": "webpack-dev-server --mode development --watch",
+    "build": "webpack --mode production"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.0",
+    "@types/babel__core": "^7.1.6",
+    "@types/babel__preset-env": "^7.9.0",
+    "@types/copy-webpack-plugin": "^5.0.0",
+    "@types/node": "^14.0.1",
+    "@types/webpack": "^4.41.13",
+    "@types/webpack-dev-server": "^3.10.1",
+    "babel-loader": "^8.1.0",
+    "copy-webpack-plugin": "^5.1.1",
+    "css-loader": "^3.4.2",
+    "html-webpack-plugin": "^4.0.1",
+    "import-glob-loader": "^1.1.0",
+    "style-loader": "^1.1.3",
+    "ts-node": "^8.10.1",
+    "tsconfig-paths": "^3.9.0",
+    "typescript": "^3.9.2",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3",
+    "write-file-webpack-plugin": "^4.5.1"
+  },
+  "dependencies": {
+    "gsap": "^3.2.6",
+    "three": "^0.114.0",
+    "ts-loader": "^6.2.2"
+  }
+}
