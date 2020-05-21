@@ -48,7 +48,7 @@ function init() {
 }
 
 function getTexturesFromAtlasFile(atlasImgUrl: string, tilesNum: number) {
-  var textures: string | any[] = [];
+  var textures: any[] = [];
 
   for (let i = 0; i < tilesNum; i++) {
     textures[i] = new Texture();
