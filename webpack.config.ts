@@ -38,6 +38,12 @@ const config: webpack.Configuration = {
         },
         exclude: /node_modules/,
       },
+      {
+        // GLSLファイルは raw-loader でインポートする
+        test: /\.(glsl|vs|fs|vert|frag)$/,
+        exclude: /node_modules/,
+        use: ["raw-loader"]
+      },
     ]
   },
   resolve: {
