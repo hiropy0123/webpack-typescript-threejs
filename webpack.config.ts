@@ -54,7 +54,13 @@ const config: webpack.Configuration = {
         flatten: true
       }
     ]),
-  ]
+  ],
+  devServer: {
+    contentBase: `${__dirname}/dist/`,
+    watchContentBase: true,
+    open: true,
+    port: 4200
+  }
 };
 
 export default config;
