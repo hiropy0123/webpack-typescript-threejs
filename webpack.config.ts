@@ -51,8 +51,12 @@ const config: webpack.Configuration = {
     new CopyPlugin({
       patterns: [
         {
-          from: `${__dirname}/static/images/**/*`,
-          to: `${__dirname}/dist/images`,
+          from: `static/images/`,
+          to: `images`,
+        },
+        {
+          from: `static/fonts/`,
+          to: `fonts`,
         },
       ],
     }),
