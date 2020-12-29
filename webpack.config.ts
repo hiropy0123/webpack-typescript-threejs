@@ -1,5 +1,5 @@
 import webpack from 'webpack';
-import CopyWebpackPlugin from 'copy-webpack-plugin';
+import CopyPlugin from 'copy-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 
 
@@ -46,6 +46,7 @@ const config: webpack.Configuration = {
       },
     ]
   },
+  target: ["web", "es5"],
   resolve: {
     extensions: ['*', '.ts', '.js']
   },
@@ -53,13 +54,14 @@ const config: webpack.Configuration = {
     new HtmlWebpackPlugin({
       template: `${__dirname}/src/index.html`
     }),
-    new CopyWebpackPlugin([
-      {
-        from: `${__dirname}/static/images/**/*`,
-        to: `${__dirname}/dist/images`,
-        flatten: true
-      }
-    ]),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: `${__dirname}/static/images/**/*`,
+          to: `${__dirname}/dist/images`,
+        }
+      ]
+    }),
   ],
   devServer: {
     contentBase: `${__dirname}/dist/`,
