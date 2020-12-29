@@ -1,12 +1,12 @@
-import { 
-  WebGLRenderer, 
-  PerspectiveCamera, 
-  Scene, 
-  DirectionalLight, 
-  BoxGeometry, 
+import {
+  WebGLRenderer,
+  PerspectiveCamera,
+  Scene,
+  DirectionalLight,
+  BoxGeometry,
   MeshLambertMaterial,
   Mesh,
-} from 'three';
+} from "three";
 
 // variables
 let renderer: WebGLRenderer;
@@ -22,7 +22,12 @@ function init() {
   scene = new Scene();
 
   // カメラの作成
-  camera = new PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 1000);
+  camera = new PerspectiveCamera(
+    50,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+  );
   camera.position.set(0, 0, 400);
   camera.lookAt(0, 0, 0);
 
@@ -33,22 +38,21 @@ function init() {
   // #container の中に配置
   container?.appendChild(renderer.domElement);
 
-
   // ライトの作成
   const light = new DirectionalLight(0xffffff, 0.8);
   light.position.set(0, 100, 500);
   // シーンにライトを追加
-  scene.add( light );
+  scene.add(light);
 
   // キューブの作成
   const geometry = new BoxGeometry(100, 100, 100);
   const material = new MeshLambertMaterial({ color: 0xffee00 });
   cube = new Mesh(geometry, material);
   // シーンにキューブを追加
-  scene.add( cube );
+  scene.add(cube);
 
   // window resize
-  window.addEventListener('resize', onWindowResize, false);
+  window.addEventListener("resize", onWindowResize, false);
 }
 
 function onWindowResize() {
