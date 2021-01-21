@@ -1,4 +1,4 @@
-import webpack from "webpack";
+import { Configuration } from "webpack";
 import CopyPlugin from "copy-webpack-plugin";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 
@@ -6,7 +6,7 @@ import HtmlWebpackPlugin from "html-webpack-plugin";
 const MODE = "development";
 const enabledSourceMap = MODE === "development";
 
-const config: webpack.Configuration = {
+const config: Configuration = {
   mode: MODE,
   entry: "./src/index.ts",
   output: {
@@ -65,7 +65,7 @@ const config: webpack.Configuration = {
     contentBase: `${__dirname}/dist/`,
     watchContentBase: true,
     open: true,
-    port: 4200,
+    port: 4600,
   },
 };
 
