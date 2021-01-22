@@ -1,138 +1,86 @@
 import {
-  BufferGeometry,
-  Color,
-  DoubleSide,
-  FontLoader,
-  Line,
-  LineBasicMaterial,
-  Mesh,
-  Object3D,
-  PerspectiveCamera,
+  Clock,
+  OrthographicCamera,
   Scene,
-  Shape,
-  ShapeBufferGeometry,
+  PlaneBufferGeometry,
+  Vector2,
+  ShaderMaterial,
+  Mesh,
   WebGLRenderer,
 } from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { IUniform } from "three/src/renderers/shaders/UniformsLib";
 
-let camera: PerspectiveCamera, scene: Scene, renderer: WebGLRenderer;
+const glsl = (x: any) => x[0].trim();
+
+const vert = glsl`
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = vec4( position, 1.0 );
+}
+`;
+
+const frag = glsl`
+precision highp float;
+uniform float time;
+uniform vec2 resolution;
+varying vec2 vUv;
+void main() {
+  float vmin = min(resolution.y, resolution.x);
+  vec2 p = vUv * 1.0 - 0.5;
+  float r = 0.5 + 0.5 * (sin(5.0 * p.x + time));
+  float g = 0.5 + 0.5 * (sin(5.0 * p.y) + sin(time + 2.0 * p.x));
+  float b = 0.5 + 0.5 * (sin(0.2 + p.x * p.y * 17.0) + sin(time * 0.4 + 4.0 * p.y));
+  gl_FragColor = vec4(r, g, b, 1.0);
+}
+`;
+
+let camera: OrthographicCamera,
+  scene: Scene,
+  renderer: WebGLRenderer,
+  uniforms: { [uniform: string]: IUniform },
+  clock: Clock;
 
 init();
 animate();
 
 function init() {
-  // Camera
-  camera = new PerspectiveCamera(
-    45,
-    window.innerWidth / window.innerHeight,
-    1,
-    10000
-  );
-  camera.position.set(0, -400, 600);
-
-  // Scene
+  clock = new Clock();
+  camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
   scene = new Scene();
-  scene.background = new Color(0xf0f0f0);
 
-  const loader = new FontLoader();
-  loader.load(
-    "fonts/helvetiker_bold.typeface.json",
-    function (font) {
-      const color = 0x006699;
+  const geometry = new PlaneBufferGeometry(2, 2);
 
-      const matDark = new LineBasicMaterial({
-        color: color,
-        side: DoubleSide,
-      });
+  uniforms = {
+    time: { value: 1.0 },
+    resolution: { value: new Vector2() },
+  };
 
-      const matLite = new LineBasicMaterial({
-        color: color,
-        transparent: true,
-        opacity: 0.4,
-        side: DoubleSide,
-      });
+  const material = new ShaderMaterial({
+    uniforms,
+    vertexShader: vert,
+    fragmentShader: frag,
+  });
 
-      const message = "Three.js\nSimple text.";
+  const mesh = new Mesh(geometry, material);
+  scene.add(mesh);
 
-      const shapes = font.generateShapes(message, 100);
-
-      const geometry = new ShapeBufferGeometry(shapes);
-
-      geometry.computeBoundingBox();
-
-      if (!geometry.boundingBox) {
-        console.log("geometry.boundingBox undefined!");
-        return;
-      }
-      const xMid =
-        -0.5 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x);
-
-      geometry.translate(xMid, 0, 0);
-
-      // make shape ( N.B. edge view remains visible )
-      const text = new Mesh(geometry, matLite);
-      text.position.z = -150;
-      scene.add(text);
-
-      // make line shape ( N.B. edge view remains visible )
-      const holeShapes: Shape[] = [];
-
-      for (let i = 0; i < shapes.length; i++) {
-        const shape = shapes[i];
-
-        if (shape.holes && shape.holes.length > 0) {
-          for (let j = 0; j < shape.holes.length; j++) {
-            const hole = shape.holes[j];
-            holeShapes.push(hole as Shape);
-          }
-        }
-      }
-
-      shapes.push.apply(shapes, holeShapes);
-
-      const lineText = new Object3D();
-
-      for (let i = 0; i < shapes.length; i++) {
-        const shape = shapes[i];
-
-        const points = shape.getPoints();
-        const geometry = new BufferGeometry().setFromPoints(points);
-
-        geometry.translate(xMid, 0, 0);
-
-        const lineMesh = new Line(geometry, matDark);
-        lineText.add(lineMesh);
-      }
-
-      scene.add(lineText);
-    } // End of Load function
-  );
-
-  // Renderer
-  renderer = new WebGLRenderer({ antialias: true });
+  renderer = new WebGLRenderer();
   renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.target.set(0, 0, 0);
-  controls.update();
+  onResize();
+  window.addEventListener("resize", onResize, false);
+}
 
-  window.addEventListener("resize", onWindowResize, false);
-} // end init
-
-function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-
+function onResize() {
   renderer.setSize(window.innerWidth, window.innerHeight);
+  uniforms.resolution.value.x = renderer.domElement.width;
+  uniforms.resolution.value.y = renderer.domElement.height;
 }
 
 function animate() {
   requestAnimationFrame(animate);
-  render();
-}
-
-function render() {
+  uniforms.time.value = clock.getElapsedTime();
   renderer.render(scene, camera);
 }
