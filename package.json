@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "gsap": "^3.6.0",
-    "three": "^0.124.0",
+    "three": "^0.125.0",
     "ts-loader": "^8.0.14"
   }
 }
