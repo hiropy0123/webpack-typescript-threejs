@@ -1,10 +1,15 @@
-import { Configuration } from "webpack";
+import { Configuration as WebpackConfiguration } from "webpack";
+import { Configuration as WebpackDevServerConfiguration } from "webpack-dev-server";
 import CopyPlugin from "copy-webpack-plugin";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 
 // 'production' か 'development' を指定
 const MODE = "development";
 const enabledSourceMap = MODE === "development";
+
+interface Configuration extends WebpackConfiguration {
+  devServer?: WebpackDevServerConfiguration;
+}
 
 const config: Configuration = {
   mode: MODE,
