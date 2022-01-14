@@ -2,7 +2,6 @@ import {
   BufferGeometry,
   Color,
   DoubleSide,
-  FontLoader,
   Line,
   LineBasicMaterial,
   Mesh,
@@ -13,6 +12,7 @@ import {
   ShapeBufferGeometry,
   WebGLRenderer,
 } from "three";
+import { FontLoader } from "three/examples/jsm/loaders/FontLoader"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 let camera: PerspectiveCamera, scene: Scene, renderer: WebGLRenderer;

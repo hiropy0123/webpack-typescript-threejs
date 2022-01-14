@@ -1,5 +1,5 @@
 import { Configuration as WebpackConfiguration } from "webpack";
-import { Configuration as WebpackDevServerConfiguration } from "webpack-dev-server";
+// import { Configuration as WebpackDevServerConfiguration } from "webpack-dev-server";
 import CopyPlugin from "copy-webpack-plugin";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 
@@ -7,11 +7,11 @@ import HtmlWebpackPlugin from "html-webpack-plugin";
 const MODE = "development";
 const enabledSourceMap = MODE === "development";
 
-interface Configuration extends WebpackConfiguration {
-  devServer?: WebpackDevServerConfiguration;
-}
+// interface Configuration extends WebpackConfiguration {
+//   devServer?: WebpackDevServerConfiguration;
+// }
 
-const config: Configuration = {
+const config: WebpackConfiguration = {
   mode: MODE,
   entry: "./src/index.ts",
   output: {
@@ -66,12 +66,12 @@ const config: Configuration = {
       ],
     }),
   ],
-  devServer: {
-    contentBase: `${__dirname}/dist/`,
-    watchContentBase: true,
-    open: true,
-    port: 4600,
-  },
+  // devServer: {
+  //   contentBase: `${__dirname}/dist/`,
+  //   watchContentBase: true,
+  //   open: true,
+  //   port: 4600,
+  // },
 };
 
 export default config;
