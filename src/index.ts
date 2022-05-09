@@ -1,86 +1,114 @@
 import {
-  Clock,
-  OrthographicCamera,
-  Scene,
-  PlaneBufferGeometry,
-  Vector2,
-  ShaderMaterial,
-  Mesh,
   WebGLRenderer,
+  Scene,
+  PerspectiveCamera,
+  Texture,
+  MeshBasicMaterial,
+  Mesh,
+  BoxBufferGeometry,
 } from "three";
-import { IUniform } from "three/src/renderers/shaders/UniformsLib";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
-const glsl = (x: any) => x[0].trim();
+// https://threejs.org/examples/#webgl_panorama_cube
+// https://github.com/mrdoob/three.js/blob/master/examples/webgl_panorama_cube.html
 
-const vert = glsl`
-varying vec2 vUv;
-void main() {
-  vUv = uv;
-  gl_Position = vec4( position, 1.0 );
-}
-`;
-
-const frag = glsl`
-precision highp float;
-uniform float time;
-uniform vec2 resolution;
-varying vec2 vUv;
-void main() {
-  float vmin = min(resolution.y, resolution.x);
-  vec2 p = vUv * 1.0 - 0.5;
-  float r = 0.5 + 0.5 * (sin(5.0 * p.x + time));
-  float g = 0.5 + 0.5 * (sin(5.0 * p.y) + sin(time + 2.0 * p.x));
-  float b = 0.5 + 0.5 * (sin(0.2 + p.x * p.y * 17.0) + sin(time * 0.4 + 4.0 * p.y));
-  gl_FragColor = vec4(r, g, b, 1.0);
-}
-`;
-
-let camera: OrthographicCamera,
-  scene: Scene,
-  renderer: WebGLRenderer,
-  uniforms: { [uniform: string]: IUniform },
-  clock: Clock;
+let camera: PerspectiveCamera;
+let renderer: WebGLRenderer;
+let scene: Scene;
+let controls: OrbitControls;
 
 init();
 animate();
 
 function init() {
-  clock = new Clock();
-  camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
-  scene = new Scene();
-
-  const geometry = new PlaneBufferGeometry(2, 2);
-
-  uniforms = {
-    time: { value: 1.0 },
-    resolution: { value: new Vector2() },
-  };
-
-  const material = new ShaderMaterial({
-    uniforms,
-    vertexShader: vert,
-    fragmentShader: frag,
-  });
-
-  const mesh = new Mesh(geometry, material);
-  scene.add(mesh);
+  const container = document.getElementById("container");
 
   renderer = new WebGLRenderer();
   renderer.setPixelRatio(window.devicePixelRatio);
-  document.body.appendChild(renderer.domElement);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  container?.appendChild(renderer.domElement);
 
-  onResize();
-  window.addEventListener("resize", onResize, false);
+  scene = new Scene();
+
+  camera = new PerspectiveCamera(
+    90,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    100
+  );
+  camera.position.z = 0.01;
+
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableZoom = false;
+  controls.enablePan = false;
+  controls.enableDamping = true;
+  controls.rotateSpeed = -0.25;
+
+  var textures = getTexturesFromAtlasFile("images/sun_temple_stripe.jpg", 6);
+
+  var materials = [];
+
+  for (let i = 0; i < 6; i++) {
+    materials.push(new MeshBasicMaterial({ map: textures[i] }));
+  }
+
+  var skyBox = new Mesh(new BoxBufferGeometry(1, 1, 1), materials);
+  skyBox.geometry.scale(1, 1, -1);
+  scene.add(skyBox);
+
+  window.addEventListener("resize", onWindowResize, false);
 }
 
-function onResize() {
+function getTexturesFromAtlasFile(atlasImgUrl: string, tilesNum: number) {
+  var textures: any[] = [];
+
+  for (let i = 0; i < tilesNum; i++) {
+    textures[i] = new Texture();
+  }
+
+  var imageObj = new Image();
+  imageObj.onload = function () {
+    var canvas;
+    var context;
+    var tileWidth = imageObj.height;
+
+    for (let i = 0; i < textures.length; i++) {
+      canvas = document.createElement("canvas");
+      context = canvas.getContext("2d");
+      canvas.width = tileWidth;
+      canvas.height = tileWidth;
+      context?.drawImage(
+        imageObj,
+        tileWidth * i,
+        0,
+        tileWidth,
+        tileWidth,
+        0,
+        0,
+        tileWidth,
+        tileWidth
+      );
+      textures[i].image = canvas;
+      textures[i].needsUpdate = true;
+    }
+  };
+
+  imageObj.src = atlasImgUrl;
+
+  return textures;
+}
+
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+
   renderer.setSize(window.innerWidth, window.innerHeight);
-  uniforms.resolution.value.x = renderer.domElement.width;
-  uniforms.resolution.value.y = renderer.domElement.height;
 }
 
 function animate() {
   requestAnimationFrame(animate);
-  uniforms.time.value = clock.getElapsedTime();
+
+  controls.update();
+
   renderer.render(scene, camera);
 }

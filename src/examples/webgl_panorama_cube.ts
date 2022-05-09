@@ -70,23 +70,23 @@ function getTexturesFromAtlasFile(atlasImgUrl: string, tilesNum: number) {
   imageObj.onload = function () {
     var canvas;
     var context;
-    var titleWidth = imageObj.height;
+    var tileWidth = imageObj.height;
 
     for (let i = 0; i < textures.length; i++) {
       canvas = document.createElement("canvas");
       context = canvas.getContext("2d");
-      canvas.width = titleWidth;
-      canvas.height = titleWidth;
+      canvas.width = tileWidth;
+      canvas.height = tileWidth;
       context?.drawImage(
         imageObj,
-        titleWidth * i,
+        tileWidth * i,
         0,
-        titleWidth,
-        titleWidth,
+        tileWidth,
+        tileWidth,
         0,
         0,
-        titleWidth,
-        titleWidth
+        tileWidth,
+        tileWidth
       );
       textures[i].image = canvas;
       textures[i].needsUpdate = true;
